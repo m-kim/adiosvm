@@ -17,6 +17,9 @@
 #include <thread>
 
 #include "adios2.h"
+#ifdef KITTIE
+#	include "kittie.h"
+#endif
 
 
 bool epsilon(double d) { return (d < 1.0e-20); }
@@ -188,10 +191,19 @@ int main(int argc, char *argv[])
 
     // adios2 io object and engine init
     adios2::ADIOS ad ("adios2.xml", comm, adios2::DebugON);
+#ifdef KITTIE
+	kittie::initialize("adios2.xml", comm, adios2::DebugON);
+#endif
+
 
     // IO objects for reading and writing
-    adios2::IO reader_io = ad.DeclareIO("SimulationOutput");
-    adios2::IO writer_io = ad.DeclareIO("PDFAnalysisOutput");
+	
+	//@kittie group="SimulationOutput"
+    adios2::IO reader_io = ad.DeclareIO("SimulationOutput");  //@kittie
+
+	//@kittie group="PDFAnalysisOutput"
+    adios2::IO writer_io = ad.DeclareIO("PDFAnalysisOutput"); //@kittie
+
     if (!rank) 
     {
         std::cout << "PDF analysis reads from Simulation using engine type:  " << reader_io.EngineType() << std::endl;
@@ -199,17 +211,37 @@ int main(int argc, char *argv[])
     }
 
     // Engines for reading and writing
-    adios2::Engine reader = reader_io.Open(in_filename, adios2::Mode::Read, comm);
-    adios2::Engine writer = writer_io.Open(out_filename, adios2::Mode::Write, comm);
+	
+	//@kittie group="SimulationOutput"
+    adios2::Engine reader = reader_io.Open(in_filename, adios2::Mode::Read, comm);  //@kittie
+
+	//@kittie group="PDFAnalysisOutput"
+    adios2::Engine writer = writer_io.Open(out_filename, adios2::Mode::Write, comm);  //@kittie
 
     bool shouldIWrite = (!rank || reader_io.EngineType() == "HDF5");
 
     // read data per timestep
+	int kstep = 0;
     int stepAnalysis = 0;
     while(true) {
 
         // Begin step
+		//@kittie group="SimulationOutput", step=kstep
         adios2::StepStatus read_status = reader.BeginStep(adios2::StepMode::NextAvailable, 10.0f);
+
+#ifdef KITTIE
+        if (read_status != adios2::StepStatus::OK)
+		{
+			if (kittie::Exists(in_filename + ".done"))
+			{
+				break;
+			}
+			else
+			{
+				continue;
+			}
+		}
+#else
         if (read_status == adios2::StepStatus::NotReady)
         {
             // std::cout << "Stream not ready yet. Waiting...\n";
@@ -220,8 +252,10 @@ int main(int argc, char *argv[])
         {
             break;
         }
+#endif
  
         int stepSimOut = reader.CurrentStep();
+		kstep++;
 
         // Inquire variable and set the selection at the first step only
         // This assumes that the variable dimensions do not change across timesteps
@@ -309,6 +343,7 @@ int main(int argc, char *argv[])
 
         // End adios2 step
         reader.EndStep();
+		//@kittie
 
         if (!rank)
         {
@@ -316,6 +351,7 @@ int main(int argc, char *argv[])
                 << " processing sim output step "
                 << stepSimOut << " sim compute step " << simStep << std::endl;
         }
+
 
         // HDF5 engine does not provide min/max. Let's calculate it
         if (reader_io.EngineType() == "HDF5")
@@ -336,6 +372,7 @@ int main(int argc, char *argv[])
         compute_pdf(v, shape, start1, count1, nbins, minmax_v.first, minmax_v.second, pdf_v, bins_v);
 
         // write U, V, and their norms out
+		//@kittie group="PDFAnalysisOutput"
         writer.BeginStep ();
         writer.Put<double> (var_u_pdf, pdf_u.data());
         writer.Put<double> (var_v_pdf, pdf_v.data());
@@ -351,11 +388,17 @@ int main(int argc, char *argv[])
         }
         writer.EndStep ();
         ++stepAnalysis;
+		//@kittie
     }
 
     // cleanup
-    reader.Close();
-    writer.Close();
+
+	//@kittie group="SimulationOutput"
+    reader.Close();  //@kittie
+
+	//@kittie group="PDFAnalysisOutput"
+    writer.Close();  //@kittie
+
     MPI_Finalize();
     return 0;
 }

@@ -1,8 +1,10 @@
 #include <iostream>
 #include <mpi.h>
 #include <vector>
-
 #include <adios2.h>
+#ifdef KITTIE
+#	include "kittie.h"
+#endif
 
 #include "gray-scott.h"
 
@@ -72,7 +74,11 @@ int main(int argc, char **argv)
     sim.init();
 
     adios2::ADIOS adios(settings.adios_config, comm, adios2::DebugON);
+#ifdef KITTIE
+	kittie::initialize(settings.adios_config, comm, adios2::DebugON);
+#endif
 
+	//@kittie group="SimulationOutput", io=io, engine=writer
     adios2::IO io = adios.DeclareIO("SimulationOutput");
 
     if (rank == 0) {
@@ -125,6 +131,7 @@ int main(int argc, char **argv)
     }
 
     writer.Close();
+	//@kittie
 
     MPI_Finalize();
 }
