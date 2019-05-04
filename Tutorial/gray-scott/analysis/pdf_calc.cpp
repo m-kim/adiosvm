@@ -198,11 +198,11 @@ int main(int argc, char *argv[])
 
     // IO objects for reading and writing
 	
-	//@kittie group="SimulationOutput"
-    adios2::IO reader_io = ad.DeclareIO("SimulationOutput");  //@kittie
+	//@kittie group="SimulationOutput";
+    adios2::IO reader_io = ad.DeclareIO("SimulationOutput");
 
-	//@kittie group="PDFAnalysisOutput"
-    adios2::IO writer_io = ad.DeclareIO("PDFAnalysisOutput"); //@kittie
+	//@kittie group="PDFAnalysisOutput";
+    adios2::IO writer_io = ad.DeclareIO("PDFAnalysisOutput");
 
     if (!rank) 
     {
@@ -212,11 +212,11 @@ int main(int argc, char *argv[])
 
     // Engines for reading and writing
 	
-	//@kittie group="SimulationOutput"
-    adios2::Engine reader = reader_io.Open(in_filename, adios2::Mode::Read, comm);  //@kittie
+	//@kittie group="SimulationOutput";
+    adios2::Engine reader = reader_io.Open(in_filename, adios2::Mode::Read, comm);
 
-	//@kittie group="PDFAnalysisOutput"
-    adios2::Engine writer = writer_io.Open(out_filename, adios2::Mode::Write, comm);  //@kittie
+	//@kittie group="PDFAnalysisOutput";
+    adios2::Engine writer = writer_io.Open(out_filename, adios2::Mode::Write, comm);
 
     bool shouldIWrite = (!rank || reader_io.EngineType() == "HDF5");
 
@@ -393,11 +393,11 @@ int main(int argc, char *argv[])
 
     // cleanup
 
-	//@kittie group="SimulationOutput"
-    reader.Close();  //@kittie
+	//@kittie group="SimulationOutput";
+    reader.Close();
 
-	//@kittie group="PDFAnalysisOutput"
-    writer.Close();  //@kittie
+	//@kittie group="PDFAnalysisOutput";
+    writer.Close();
 
     MPI_Finalize();
     return 0;
