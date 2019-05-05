@@ -190,10 +190,14 @@ int main(int argc, char *argv[])
     adios2::Variable<double> var_u_out, var_v_out;
 
     // adios2 io object and engine init
+
+	
+	//@kittie init="adios2.xml", comm=comm;
     adios2::ADIOS ad ("adios2.xml", comm, adios2::DebugON);
-#ifdef KITTIE
-	kittie::initialize("adios2.xml", comm, adios2::DebugON);
-#endif
+
+//#ifdef KITTIE
+//	kittie::initialize("adios2.xml", comm, adios2::DebugON);
+//#endif
 
 
     // IO objects for reading and writing
