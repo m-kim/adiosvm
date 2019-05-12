@@ -2,10 +2,6 @@
 #include <mpi.h>
 #include <vector>
 #include <adios2.h>
-#ifdef KITTIE
-#	include "kittie.h"
-#endif
-
 #include "gray-scott.h"
 
 void print_io_settings(const adios2::IO &io)
@@ -72,12 +68,12 @@ int main(int argc, char **argv)
     GrayScott sim(settings, comm);
     sim.init();
 
-    adios2::ADIOS adios(settings.adios_config, comm, adios2::DebugON);
-#ifdef KITTIE
-	kittie::initialize(settings.adios_config, comm, adios2::DebugON);
-#endif
 
-	//@kittie group="SimulationOutput"
+	//@effis-init xml="adios2.xml", comm=comm
+    adios2::ADIOS adios(settings.adios_config, comm, adios2::DebugON);
+
+
+	//@effis-begin "SimulationOutput"->"ConcentrationData"
     adios2::IO io = adios.DeclareIO("SimulationOutput");
 
     if (rank == 0) {
@@ -130,7 +126,7 @@ int main(int argc, char **argv)
     }
 
     writer.Close();
-	//@kittie
-
+	//@effis-end
+	
     MPI_Finalize();
 }
