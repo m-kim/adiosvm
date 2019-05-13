@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
 
     // IO objects for reading and writing
 	
-	//@effis-begin reader_io-->"ConcentrationData", step=kstep; writer--->"PDFData"
+	//@effis-begin reader_io-->"ConcentrationData"; writer--->"PDFData"
     adios2::IO reader_io = ad.DeclareIO("SimulationOutput");
     adios2::IO writer_io = ad.DeclareIO("PDFAnalysisOutput");
 
