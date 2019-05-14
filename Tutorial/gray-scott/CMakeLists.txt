@@ -22,7 +22,7 @@ if(USE_KITTIE)
 	add_custom_command(
 		OUTPUT  ${gs} ${pdf}
 		DEPENDS simulation/main.cpp analysis/pdf_calc.cpp
-		COMMAND kittie-cpp.py repo ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} --suffix="-kittie" --name=grayscott --mimic --new
+		COMMAND kittie-cpp.py repo ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} --suffix="-kittie" --name=grayscott --mimic
 	)
 else(USE_KITTIE)
 	set(gs  simulation/main.cpp)
