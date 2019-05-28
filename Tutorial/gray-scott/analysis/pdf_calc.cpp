@@ -368,6 +368,7 @@ int main(int argc, char *argv[])
     writer.Close();
 	//@effis-end
 
+	//@effis-finalize
     MPI_Finalize();
     return 0;
 }
