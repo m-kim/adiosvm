@@ -106,7 +106,7 @@ int main(int argc, char **argv)
     adios2::Engine writer = io.Open(settings.output, adios2::Mode::Write);
 
     for (int i = 0; i < settings.steps; i++) {
-		//@effis-timestep physical=i*s.dt, number=i
+		//@effis-timestep physical=i*settings.dt, number=i
 		
         sim.iterate();
 
