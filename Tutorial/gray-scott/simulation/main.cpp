@@ -105,8 +105,10 @@ int main(int argc, char **argv)
 
     sim.init();
 
+	//@effis-init xml=settings.adios_config, comm=comm
     adios2::ADIOS adios(settings.adios_config, comm, adios2::DebugON);
 
+	//@effis-begin "SimulationOutput"->"SimulationOutput"
     adios2::IO io = adios.DeclareIO("SimulationOutput");
 
     if (rank == 0) {
@@ -178,6 +180,8 @@ int main(int argc, char **argv)
                       << std::endl;
         }
 
+		//@effis-timestep physical=i*settings.dt, number=i
+
         if (settings.adios_span) {
             writer.BeginStep();
             writer.Put<int>(varStep, &i);
@@ -219,6 +223,8 @@ int main(int argc, char **argv)
 #endif
 
     writer.Close();
+	//@effis-end
 
+	//@effis-finalize
     MPI_Finalize();
 }

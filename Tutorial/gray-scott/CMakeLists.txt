@@ -6,7 +6,11 @@ if(POLICY CMP0074)
   cmake_policy(SET CMP0074 NEW)
 endif()
 
+
 project(gray-scott C CXX)
+
+set(simfiles simulation/main.cpp simulation/gray-scott.cpp simulation/settings.cpp)
+set(pdffiles analysis/pdf_calc.cpp)
 
 find_package(MPI REQUIRED)
 find_package(ADIOS2 REQUIRED)
@@ -17,15 +21,34 @@ if(USE_TIMERS)
   add_definitions(-DENABLE_TIMERS)
 endif()
 
+option(USE_EFFIS "Use EFFIS")
+if(USE_EFFIS)
+	message(STATUS "Enabling EFFIS")
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake_modules)
+	set(effis_suffix -kittie)
+	set(effis_pattern *${suffix}.cpp)
+	find_package(EFFIS REQUIRED)
+	file(COPY common DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+	file(COPY simulation/gray-scott.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/simulation)
+	file(COPY simulation/settings.h   DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/simulation)
+	kpcmake("${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}" ${effis_suffix})
+	file(GLOB_RECURSE effisfiles RELATIVE ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/${effis_pattern})
+	listreplace("${simfiles}" "${effisfiles}" "${effis_suffix}" simfiles)
+endif()
+
+
 # We are not using the C++ API of MPI, this will stop the compiler look for it
 add_definitions(-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX)
 
-add_executable(gray-scott simulation/main.cpp simulation/gray-scott.cpp
-  simulation/settings.cpp)
+add_executable(gray-scott ${simfiles})
 target_link_libraries(gray-scott adios2::adios2 MPI::MPI_C)
 
 add_executable(pdf_calc analysis/pdf_calc.cpp)
 target_link_libraries(pdf_calc adios2::adios2 MPI::MPI_C)
+
+if(USE_EFFIS)
+	target_link_libraries(gray-scott EFFIS::cpp)
+endif()
 
 option(VTK "Build VTK apps")
 if (VTK_ROOT)
