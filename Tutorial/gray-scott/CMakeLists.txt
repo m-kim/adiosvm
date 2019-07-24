@@ -34,6 +34,7 @@ if(USE_EFFIS)
 	kpcmake("${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}" ${effis_suffix})
 	file(GLOB_RECURSE effisfiles RELATIVE ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/${effis_pattern})
 	listreplace("${simfiles}" "${effisfiles}" "${effis_suffix}" simfiles)
+	listreplace("${pdffiles}" "${effisfiles}" "${effis_suffix}" pdffiles)
 endif()
 
 
@@ -43,11 +44,12 @@ add_definitions(-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX)
 add_executable(gray-scott ${simfiles})
 target_link_libraries(gray-scott adios2::adios2 MPI::MPI_C)
 
-add_executable(pdf_calc analysis/pdf_calc.cpp)
+add_executable(pdf_calc ${pdffiles})
 target_link_libraries(pdf_calc adios2::adios2 MPI::MPI_C)
 
 if(USE_EFFIS)
 	target_link_libraries(gray-scott EFFIS::cpp)
+	target_link_libraries(pdf_calc EFFIS::cpp)
 endif()
 
 option(VTK "Build VTK apps")

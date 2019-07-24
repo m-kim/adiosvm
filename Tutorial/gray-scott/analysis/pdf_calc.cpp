@@ -166,9 +166,11 @@ int main(int argc, char *argv[])
     adios2::Variable<double> var_u_out, var_v_out;
 
     // adios2 io object and engine init
+	//@effis-init xml="adios2.xml", comm=comm
     adios2::ADIOS ad("adios2.xml", comm, adios2::DebugON);
 
     // IO objects for reading and writing
+	//@effis-begin "SimulationOutput"->"SimulationOutput"; "PDFAnalysisOutput"->"PDFAnalysisOutput"
     adios2::IO reader_io = ad.DeclareIO("SimulationOutput");
     adios2::IO writer_io = ad.DeclareIO("PDFAnalysisOutput");
     if (!rank) {
@@ -179,12 +181,15 @@ int main(int argc, char *argv[])
     }
 
     // Engines for reading and writing
-    adios2::Engine reader =
-        reader_io.Open(in_filename, adios2::Mode::Read, comm);
+    adios2::Engine reader = 
+		reader_io.Open(in_filename, adios2::Mode::Read, comm);
     adios2::Engine writer =
         writer_io.Open(out_filename, adios2::Mode::Write, comm);
 
     bool shouldIWrite = (!rank || reader_io.EngineType() == "HDF5");
+
+	adios2::Attribute<double> dtAttr = reader_io.InquireAttribute<double>("dt");
+	double dt = dtAttr.Data()[0];
 
     // read data per timestep
     int stepAnalysis = 0;
@@ -276,6 +281,8 @@ int main(int argc, char *argv[])
         // End adios2 step
         reader.EndStep();
 
+		//@effis-timestep physical=simStep*dt, number=simStep
+
         if (!rank) {
             std::cout << "PDF Analysis step " << stepAnalysis
                       << " processing sim output step " << stepSimOut
@@ -322,6 +329,8 @@ int main(int argc, char *argv[])
     // cleanup
     reader.Close();
     writer.Close();
+	//@effis-end
+	//@effis-finalize
     MPI_Finalize();
     return 0;
 }
