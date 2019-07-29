@@ -222,9 +222,13 @@ int main(int argc, char **argv)
     log.close();
 #endif
 
+	std::cout << "Closing" << std::endl;
     writer.Close();
 	//@effis-end
 
+	std::cout << "Finalizing" << std::endl;
 	//@effis-finalize
+	std::cout << "MPI Finalizing" << std::endl;
     MPI_Finalize();
+	std::cout << "Done MPI Finalizing" << std::endl;
 }
