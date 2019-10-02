@@ -1,4 +1,5 @@
 #include "writer.h"
+#include "adios2.h"
 
 void define_bpvtk_attribute(const Settings &s, adios2::IO &io)
 {
@@ -74,7 +75,10 @@ Writer::Writer(const Settings &settings, const GrayScott &sim, adios2::IO io)
 
 void Writer::open(const std::string &fname)
 {
+
+    //@effis-begin io-->io.Name()
     writer = io.Open(fname, adios2::Mode::Write);
+    //@effis-end
 }
 
 void Writer::write(int step, const GrayScott &sim)
@@ -83,12 +87,16 @@ void Writer::write(int step, const GrayScott &sim)
         const std::vector<double> &u = sim.u_ghost();
         const std::vector<double> &v = sim.v_ghost();
 
+        //@effis-begin writer--->io.Name()
         writer.BeginStep();
         writer.Put<int>(var_step, &step);
         writer.Put<double>(var_u, u.data());
         writer.Put<double>(var_v, v.data());
         writer.EndStep();
+        //@effis-end
+
     } else if (settings.adios_span) {
+        //@effis-begin writer--->io.Name()
         writer.BeginStep();
 
         writer.Put<int>(var_step, &step);
@@ -102,7 +110,9 @@ void Writer::write(int step, const GrayScott &sim)
         sim.v_noghost(v_span.data());
 
         writer.EndStep();
+        //@effis-end
     } else {
+        //@effis-begin writer--->io.Name()
         std::vector<double> u = sim.u_noghost();
         std::vector<double> v = sim.v_noghost();
 
@@ -111,7 +121,15 @@ void Writer::write(int step, const GrayScott &sim)
         writer.Put<double>(var_u, u.data());
         writer.Put<double>(var_v, v.data());
         writer.EndStep();
+        //@effis-end
     }
 }
 
-void Writer::close() { writer.Close(); }
+void Writer::close()
+{ 
+    //@effis-begin writer--->io.Name()
+    std::cout << "close" << std::endl;
+    writer.Close(); 
+    std::cout << "done" << std::endl;
+    //@effis-end
+}

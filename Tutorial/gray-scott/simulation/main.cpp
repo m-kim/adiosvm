@@ -67,9 +67,13 @@ int main(int argc, char **argv)
     GrayScott sim(settings, comm);
     sim.init();
 
+    //@effis-init xml=settings.adios_config, comm=comm
     adios2::ADIOS adios(settings.adios_config, comm, adios2::DebugON);
+
+    //@effis-begin "SimulationOutput"->"SimulationOutput"; "SimulationCheckpoint"->"SimulationCheckpoint"
     adios2::IO io_main = adios.DeclareIO("SimulationOutput");
     adios2::IO io_ckpt = adios.DeclareIO("SimulationCheckpoint");
+    //@effis-end
 
     Writer writer_main(settings, sim, io_main);
     Writer writer_ckpt(settings, sim, io_ckpt);
@@ -97,6 +101,9 @@ int main(int argc, char **argv)
 #endif
 
     for (int i = 0; i < settings.steps;) {
+
+        //@effis-timestep number=i, physical=i*settings.dt
+
 #ifdef ENABLE_TIMERS
         MPI_Barrier(comm);
         timer_total.start();
@@ -148,5 +155,9 @@ int main(int argc, char **argv)
     log.close();
 #endif
 
+    std::cout << "final 1" << std::endl;
+    //@effis-finalize
+    std::cout << "final 2" << std::endl;
     MPI_Finalize();
+    std::cout << "final 3" << std::endl;
 }

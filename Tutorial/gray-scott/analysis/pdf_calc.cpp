@@ -167,9 +167,12 @@ int main(int argc, char *argv[])
 
     {
         // adios2 io object and engine init
+
+        //@effis-init xml="adios2.xml", comm=comm
         adios2::ADIOS ad("adios2.xml", comm, adios2::DebugON);
 
         // IO objects for reading and writing
+        //@effis-begin "SimulationOutput"->"SimulationOutput"; "PDFAnalysisOutput"->"PDFAnalysisOutput"
         adios2::IO reader_io = ad.DeclareIO("SimulationOutput");
         adios2::IO writer_io = ad.DeclareIO("PDFAnalysisOutput");
         if (!rank) {
@@ -277,6 +280,8 @@ int main(int argc, char *argv[])
             // End adios2 step
             reader.EndStep();
 
+            //@effis-timestep number=simStep, physical=simStep*2.0
+
             if (!rank) {
                 std::cout << "PDF Analysis step " << stepAnalysis
                     << " processing sim output step " << stepSimOut
@@ -323,9 +328,11 @@ int main(int argc, char *argv[])
         // cleanup
         reader.Close();
         writer.Close();
+        //@effis-end
     }
 
     MPI_Barrier(comm);
+    //@effis-finalize
     MPI_Finalize();
     return 0;
 }
