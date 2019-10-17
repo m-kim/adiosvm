@@ -128,8 +128,6 @@ void Writer::write(int step, const GrayScott &sim)
 void Writer::close()
 { 
     //@effis-begin writer--->io.Name()
-    std::cout << "close" << std::endl;
     writer.Close(); 
-    std::cout << "done" << std::endl;
     //@effis-end
 }

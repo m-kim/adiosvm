@@ -41,7 +41,8 @@ endfunction()
 
 # The rest of this is pretty standard CMake search for a package
 
-find_file(KITTIE_COMPOSE kittie-compose.py  HINTS "$ENV{KITTIE_DIR}/bin")
+#find_file(KITTIE_COMPOSE bin/kittie-compose.py  HINTS "$ENV{KITTIE_DIR}/bin")
+find_file(KITTIE_COMPOSE kittie.h  HINTS "$ENV{KITTIE_DIR}/include")
 
 if(KITTIE_COMPOSE)
     set(KITTIE_FOUND TRUE)

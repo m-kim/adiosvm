@@ -155,9 +155,6 @@ int main(int argc, char **argv)
     log.close();
 #endif
 
-    std::cout << "final 1" << std::endl;
     //@effis-finalize
-    std::cout << "final 2" << std::endl;
     MPI_Finalize();
-    std::cout << "final 3" << std::endl;
 }
