@@ -3,7 +3,7 @@ function(kpcmake src dest suffix)
     #   * ${src} is just the XGC repo -- the source we want to check for EFFIS pragmas
     #   * The --tree-output is where the output files will go, and in particular we can send them to the CMake build are
     #   * --suffix is a suffix appended to the processes sourced files. It doesn't really matter here
-    execute_process(COMMAND kittie-cpp.py repo ${src} --tree-output=${dest} --suffix=${suffix})
+    execute_process(COMMAND ${KITTIE_PREFIX}/bin/kittie-cpp.py repo ${src} --tree-output=${dest} --suffix=${suffix})
 endfunction()
 
 function(listreplace srcfiles effisfiles suffix result)
@@ -46,9 +46,8 @@ find_file(KITTIE_COMPOSE kittie.h  HINTS "$ENV{KITTIE_DIR}/include")
 
 if(KITTIE_COMPOSE)
     set(KITTIE_FOUND TRUE)
-    get_filename_component(KITTIE_BINDIR ${KITTIE_COMPOSE} DIRECTORY)
-    get_filename_component(KITTIE_PREFIX ${KITTIE_BINDIR}  DIRECTORY)
-    set(KITTIE_INCLUDE_DIRS ${KITTIE_PREFIX}/include)
+    get_filename_component(KITTIE_INCLUDE_DIRS ${KITTIE_COMPOSE} DIRECTORY)
+    get_filename_component(KITTIE_PREFIX ${KITTIE_INCLUDE_DIRS}  DIRECTORY)
     set(KITTIE_LIBRARY_DIRS ${KITTIE_PREFIX}/lib)
     find_library(kittie_cpp     NAMES kittie   HINTS ${KITTIE_LIBRARY_DIRS})
     find_library(kittie_fortran NAMES kittie_f HINTS ${KITTIE_LIBRARY_DIRS})

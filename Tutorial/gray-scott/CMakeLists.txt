@@ -40,8 +40,6 @@ if (EFFIS)
     listreplace("${analysis_files}" "${effis_analysis_files}" "-kittie" analysis_files)
 endif()
 
-message(STATUS "EFFIS library: ${effis_lib}")
-
 # We are not using the C++ API of MPI, this will stop the compiler look for it
 add_definitions(-DOMPI_SKIP_MPICXX -DMPICH_SKIP_MPICXX)
 add_executable(gray-scott ${sim_files})
