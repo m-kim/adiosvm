@@ -102,8 +102,6 @@ int main(int argc, char **argv)
 
     for (int i = 0; i < settings.steps;) {
 
-        //@effis-timestep number=i, physical=i*settings.dt
-
 #ifdef ENABLE_TIMERS
         MPI_Barrier(comm);
         timer_total.start();
@@ -143,7 +141,9 @@ int main(int argc, char **argv)
 
         log << i << "\t" << time_step << "\t" << time_compute << "\t"
             << time_write << std::endl;
+
 #endif
+        //@effis-timestep number=i, physical=i*settings.dt
     }
 
     writer_main.close();
